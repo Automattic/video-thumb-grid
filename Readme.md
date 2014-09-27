@@ -32,6 +32,8 @@ Options:
 - `count` (`Number`) number of thumbnails to generate
 - `interval` (`Number`) how many seconds to wait between thumbs
 - `start` (Number) seek to the given number of seconds (defaults to `0`)
+- `width` (Number) width of individual thumb image
+- `height` (Number) width of individual thumb image
 
 ## Requirements
 
