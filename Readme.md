@@ -5,7 +5,7 @@ Generates a sprite grid of video thumbnails using `ffmpeg`.
 
 ## How to use
 
-```
+```js
 var fs = require('fs');
 var thumbs = require('video-thumb-grid');
 var input = fs.createReadStream('video.mov');
