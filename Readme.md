@@ -29,11 +29,22 @@ Invokes the grid thumbnail generation process for the given
 
 Options:
 
-- `count` (`Number`) number of thumbnails to generate
-- `interval` (`Number`) how many seconds to wait between thumbs
-- `start` (Number) seek to the given number of seconds (defaults to `0`)
-- `width` (Number) width of individual thumb image
-- `height` (Number) width of individual thumb image
+- `count` (`Number`) number of thumbnails to generate. Defaults to `100`.
+- `interval` (`Number`) how many seconds to wait between thumbs.
+  Defaults to `100`.
+- `start` (Number) seek to the given number of seconds. Defaults to `0`.
+- `width` (Number) width of individual thumb image. Defaults to `64`.
+- `height` (Number) width of individual thumb image. Defaults to `48`.
+- `quality` (Number) quality of resulting JPEG. Defaults to `70`.
+- `vquality` (Number) quality of frames returned by `ffmpeg`. This
+  corresponds to the `q:v` option, which takes a value from `1` (highest)
+  to `31` (lowest). Defaults to `1`.
+
+Notes:
+
+- If the `interval` and `start` combination can't possibly meet `count`
+  due to the length of the video, the grid will be populated with empty
+  spaces.
 
 ## Requirements
 
