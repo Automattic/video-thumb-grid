@@ -34,7 +34,7 @@ Options:
   Defaults to `5`.
 - `start` (Number) seek to the given number of seconds. Defaults to `0`.
 - `width` (Number) width of individual thumb image. Defaults to `64`.
-- `height` (Number) width of individual thumb image. Defaults to `48`.
+- `height` (Number) height of individual thumb image. Defaults to `48`.
 - `quality` (Number) quality of resulting JPEG. Defaults to `70`.
 - `vquality` (Number) quality of frames returned by `ffmpeg`. This
   corresponds to the `q:v` option, which takes a value from `1` (highest)
