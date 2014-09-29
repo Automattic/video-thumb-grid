@@ -20,7 +20,7 @@ function Grid(input, opts, fn){
   this.quality = opts.quality || 75;
   this.vquality = opts.vquality || 1;
   this.width = opts.width || 64;
-  this.height = opts.height;
+  this.height = opts.height || 48;
   this.start = opts.start || 0;
 
   var count = opts;
