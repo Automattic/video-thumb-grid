@@ -31,7 +31,7 @@ Options:
 
 - `count` (`Number`) number of thumbnails to generate. Defaults to `100`.
 - `interval` (`Number`) how many seconds to wait between thumbs.
-  Defaults to `100`.
+  Defaults to `5`.
 - `start` (Number) seek to the given number of seconds. Defaults to `0`.
 - `width` (Number) width of individual thumb image. Defaults to `64`.
 - `height` (Number) width of individual thumb image. Defaults to `48`.
