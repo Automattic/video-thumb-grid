@@ -4,6 +4,10 @@ var spawn = require('child_process');
 module.exports = Grid;
 
 function Grid(input, opts, fn){
+  if (!(this instanceof Grid)) {
+    return new Grid(input, opts, fn);
+  }
+
   if ('function' == typeof opts) {
     fn = opts;
     opts = {};
