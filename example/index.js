@@ -1,6 +1,5 @@
 
 var fs = require('fs');
-var fs = require('fs');
 var grid = require('..');
 var join = require('path').join;
 var exec = require('child_process').exec;
