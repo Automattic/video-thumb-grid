@@ -37,7 +37,7 @@ Options:
 - `height` (`Number`) height of individual thumb image. Defaults to `48`.
 - `quality` (`Number`) quality of resulting JPEG. Defaults to `70`.
 - `vquality` (`Number`) quality of frames returned by `ffmpeg`. This
-  corresponds to the `q:v` option, which takes a value from `1` (highest)
+  corresponds to the `q` option, which takes a value from `1` (highest)
   to `31` (lowest). Defaults to `1`.
 
 Notes:
