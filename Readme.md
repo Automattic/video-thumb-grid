@@ -30,6 +30,8 @@ Invokes the grid thumbnail generation process for the given
 Options:
 
 - `count` (`Number`) number of thumbnails to generate. Defaults to `100`.
+- `rows` (`Number`) numb of rows in the grid. Defaults to the creating a
+  "square" by calculating the square root of `count`.
 - `interval` (`Number`) how many seconds to wait between thumbs.
   Defaults to `5`.
 - `start` (`Number`) seek to the given number of seconds. Defaults to `0`.
