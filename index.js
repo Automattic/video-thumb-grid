@@ -27,8 +27,8 @@ function Grid(input, opts, fn){
   this.interval = opts.interval || 5;
   this.quality = opts.quality || 70;
   this.vquality = opts.vquality || 1;
-  this.width = opts.width || 64;
-  this.height = opts.height || 48;
+  this.width = opts.width || 192;
+  this.height = opts.height || 144;
   this.start = opts.start || 0;
   this.next_x = 0;
   this.next_y = 0;
