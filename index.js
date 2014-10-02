@@ -58,6 +58,11 @@ function Grid(input, opts, fn){
 
   var grid = this;
   ffmpeg.stdout.pipe(parser).on('data', function(buf) {
+    // Grid is full. Don't try to push another jpeg or FixedJpegStack will throw an error
+    if ( grid.next_y >= grid.jpeg_h ) {
+      return;
+    }
+
     jpegStack.push(JpegJS.decode(buf).data, grid.next_x, grid.next_y, grid.width, grid.height);
     if ( grid.next_x + grid.width >= grid.jpeg_w ) {
       grid.next_x = 0;
@@ -68,10 +73,6 @@ function Grid(input, opts, fn){
   });
 
   ffmpeg.stdout.on('end', function() {
-    if (parser.count > grid.count) {
-      throw new Error('Too many images. ' + parser.count + ' found, ' + grid.count + ' expected');
-    }
-
     if (parser.jpeg) {
       throw new Error('JPEG end was expected.');
     }
