@@ -1,9 +1,12 @@
 {
   "name": "video-thumb-grid",
   "version": "0.0.1",
-  "description": "",
+  "description": "Generates a sprite grid of video thumbnails using `ffmpeg`.",
   "dependencies": {
-    "timecodeutils": "0.0.1",
-    "jpeg": "2.0.0"
+    "debug": "2.0.0",
+    "jpeg": "2.0.0",
+    "jpeg-js": "0.0.4",
+    "jpeg-stream": "0.1.0",
+    "timecodeutils": "0.0.1"
   }
 }

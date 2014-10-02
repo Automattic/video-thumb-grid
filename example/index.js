@@ -1,18 +1,15 @@
-
-var fs = require('fs');
 var grid = require('..');
 var join = require('path').join;
 var exec = require('child_process').exec;
+var write = require('fs').writeFileSync;
 
-grid(fs.createReadStream(join(__dirname, 'sample.mov')), {
-  count: 100,
-  interval: 1.2,
-  width: 64,
-  height: 48
-}, function(err, buf){
-  var output = join(process.cwd(), 'result.jpg');
-  fs.writeFileSync(output, buf);
-  exec('open ' + output, function(err){
-    if (err) return console.log('grid written to: ' + output);
+var file = grid('sample.mov');
+file.count(64);
+file.interval(1);
+file.render(function(err, buf){
+  var out = join(__dirname, 'grid.jpg');
+  write(out, buf);
+  exec('open ' + out, function(err){
+    if (err) return console.log('Grid written to ' + out);
   });
 });
