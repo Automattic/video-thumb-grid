@@ -1,88 +1,173 @@
-var fs = require('fs');
-var join = require('path').join;
-var exec = require('child_process').exec;
 var spawn = require('child_process').spawn;
 var JPEGStream = require('jpeg-stream');
-var parser = new JPEGStream;
-var JpegLib = require('jpeg');
-var timecodeutils = require('timecodeutils');
-var JpegJS = require('jpeg-js');
+var JPEGStack = require('jpeg').FixedJpegStack;
+var time = require('timecodeutils');
+var decode = require('jpeg-js').decode;
+var debug = require('debug')('video-thumb-grid');
 
 module.exports = Grid;
 
-function Grid(input, opts, fn){
-  if (!(this instanceof Grid)) {
-    return new Grid(input, opts, fn);
+function Grid(input, fn){
+  if (!(this instanceof Grid)) return new Grid(input, fn);
+
+  // input stream
+  this._input = input;
+
+  // config
+  this._count = 100;
+  this._interval = 5;
+  this._quality = 70;
+  this._vquality = 1;
+  this._width = 192;
+  this._height = 144;
+  this._start = 0;
+  this._rows = Math.ceil(Math.sqrt(this._count));
+
+  this.parser = new JPEGStream;
+}
+
+Grid.prototype.start = function(v){
+  if (arguments.length) {
+    this._start = v;
+    return this;
   }
+  return this._start;
+};
 
-  if ('function' == typeof opts) {
-    fn = opts;
-    opts = {};
+Grid.prototype.quality = function(v){
+  if (arguments.length) {
+    this._quality = v;
+    return this;
   }
+  return this._quality;
+};
 
-  opts = opts || {};
+Grid.prototype.vquality = function(v){
+  if (arguments.length) {
+    this._vquality = v;
+    return this;
+  }
+  return this._vquality;
+};
 
-  // TODO - make sure our opts are ints
-  this.count = opts.count || 100;
-  this.interval = opts.interval || 5;
-  this.quality = opts.quality || 70;
-  this.vquality = opts.vquality || 1;
-  this.width = opts.width || 192;
-  this.height = opts.height || 144;
-  this.start = opts.start || 0;
-  this.next_x = 0;
-  this.next_y = 0;
-  this.rows = opts.rows || Math.ceil(Math.sqrt(this.count));
-  this.jpeg_w = this.width * Math.ceil(this.count / this.rows);
-  this.jpeg_h = this.height * this.rows;
+Grid.prototype.width = function(v){
+  if (arguments.length) {
+    this._width = v;
+    return this;
+  }
+  return this._width;
+};
 
-  var jpegStack = new JpegLib.FixedJpegStack(this.jpeg_w, this.jpeg_h, 'rgba');
+Grid.prototype.height = function(v){
+  if (arguments.length) {
+    this._height = v;
+    return this;
+  }
+  return this._height;
+};
 
-  var ffmpeg = spawn('ffmpeg', [
-    '-i',
-    input,
-    '-ss',
-    timecodeutils.secondsToTC(this.start),
-    '-f',
-    'image2',
-    '-vf',
-    'fps=1/' + this.interval + ",scale='max(" + this.width + ',a*' + this.height + ")':'max(" + this.height + ',' + this.width + "/a)',crop=" + this.width + ':' + this.height,
-    '-q',
-    this.vquality,
-    '-vframes',
-    this.count,
-    '-updatefirst',
-    '1',
-    '-'
-  ]);
+Grid.prototype.count = function(v){
+  if (arguments.length) {
+    this._count = v;
+    return this;
+  }
+  return this._count;
+};
 
-  var grid = this;
-  ffmpeg.stdout.pipe(parser).on('data', function(buf) {
-    // Grid is full. Don't try to push another jpeg or FixedJpegStack will throw an error
-    if ( grid.next_y >= grid.jpeg_h ) {
-      return;
-    }
+Grid.prototype.interval = function(v){
+  if (arguments.length) {
+    this._interval = v;
+    return this;
+  }
+  return this._interval;
+};
 
-    jpegStack.push(JpegJS.decode(buf).data, grid.next_x, grid.next_y, grid.width, grid.height);
-    if ( grid.next_x + grid.width >= grid.jpeg_w ) {
-      grid.next_x = 0;
-      grid.next_y += grid.height;
+Grid.prototype.args = function(){
+  var argv = [];
+
+  // input stream
+  argv.push('-i', this._input);
+
+  // seek
+  argv.push('-ss', time.secondsToTC(this.start()));
+
+  // format
+  argv.push('-f', 'image2');
+
+  // resize and crop
+  var vf =  'fps=1/' + this.interval() + ",scale='max(" + this.width()
+    + ',a*' + this.height() + ")':'max(" + this.height() + ','
+    + this.width() + "/a)',crop=" + this.width() + ':' + this.height();
+  argv.push('-vf', vf);
+
+  // number of frames
+  argv.push('-vframes', this._count);
+
+  // ensure streaming output
+  argv.push('-updatefirst', 1);
+
+  // stdout
+  argv.push('-');
+
+  return argv;
+};
+
+Grid.prototype.render = function(fn){
+  var self = this;
+  var args = this.args();
+  var width = this.width();
+  var height = this.height();
+  var total_w = width * Math.ceil(this.count() / this.rows());
+  var total_h = height * this.rows();
+  var jpeg = new JPEGStack(total_w, total_h, 'rgba');
+  var x = 0, y = 0;
+
+  debug('running ffmpeg with "%s"', args.join(' '));
+  this.proc = spawn('ffmpeg', args);
+  this.proc.stdout
+  .pipe(this.parser)
+  .on('data', function(buf) {
+    // grid is full
+    if (y >= total_h) return;
+
+    // decode
+    debug('decoding jpeg thumb');
+    var rgba = decode(buf).data;
+
+    // add thumb
+    debug('adding buffer');
+    jpeg.push(rgba, x, y, width, height);
+
+    // calculate next x/y
+    if (x + self.width() >= total_w) {
+      x = 0;
+      y += height;
     } else {
-      grid.next_x += grid.width;
+      x += width;
     }
   });
 
-  ffmpeg.stdout.on('end', function() {
-    if (parser.jpeg) {
-      throw new Error('JPEG end was expected.');
-    }
+  this.proc.once('error', function(err){
+    debug('error %s', err.stack);
+    if (self._aborted) return debug('aborted');
+    self._error = true;
+    fn(err);
+  });
 
-    var output = join(process.cwd(), 'result.jpg');
-    fs.writeFileSync(output, jpegStack.encodeSync());
-    exec('open ' + output, function(err) {
-      if (err) {
-        return console.log('Grid written to ' + output);
-      }
+  this.proc.stdout.on('end', function() {
+    debug('stdout end');
+    if (self._error) return debug('errored');
+    if (self._aborted) return debug('aborted');
+    if (self.parser.jpeg) return fn(new Error('JPEG end was expected.'));
+    debug('jpeg encode');
+    jpeg.encode(function(buf){
+      fn(null, buf);
     });
   });
-}
+};
+
+Grid.prototype.abort = function(){
+  debug('aborting');
+  this._aborted = true;
+  this.proc.kill('SIGHUP');
+};
