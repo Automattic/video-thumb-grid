@@ -5,6 +5,7 @@
   "dependencies": {
     "timecodeutils": "0.0.1",
     "jpeg": "2.0.0",
-    "jpeg-stream": "0.1.0"
+    "jpeg-stream": "0.1.0",
+    "jpeg-js": "0.0.4"
   }
 }

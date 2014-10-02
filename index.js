@@ -6,6 +6,7 @@ var JPEGStream = require('jpeg-stream');
 var parser = new JPEGStream;
 var JpegLib = require('jpeg');
 var timecodeutils = require('timecodeutils');
+var JpegJS = require('jpeg-js');
 
 module.exports = Grid;
 
@@ -24,7 +25,7 @@ function Grid(input, opts, fn){
   // TODO - make sure our opts are ints
   this.count = opts.count || 100;
   this.interval = opts.interval || 5;
-  this.quality = opts.quality || 75;
+  this.quality = opts.quality || 70;
   this.vquality = opts.vquality || 1;
   this.width = opts.width || 64;
   this.height = opts.height || 48;
@@ -45,7 +46,8 @@ function Grid(input, opts, fn){
     '-f',
     'image2',
     '-vf',
-    'fps=1/' + this.interval,
+//    'fps=1/' + this.interval + ',scale=max(' + this.width + ',a*' + this.height + '):max(' + this.height + ',' + this.width + '/a),crop=' + this.width + ':' + this.height,
+    'fps=1/' + this.interval + ', scale=' + this.width + ':' + this.height + ', crop=' + this.width + ':' + this.height,
     '-q',
     this.vquality,
     '-vframes',
@@ -57,12 +59,7 @@ function Grid(input, opts, fn){
 
   var grid = this;
   ffmpeg.stdout.pipe(parser).on('data', function(buf) {
-    // spit out individual images for debugging
-    var jpeg = new JpegLib.Jpeg(buf, grid.width, grid.height, 'rgba');
-    fs.writeFileSync('./thumb' + parser.count + '.jpg', jpeg.encodeSync());
-
-
-    jpegStack.push(buf, grid.next_x, grid.next_y, grid.width, grid.height);
+    jpegStack.push(JpegJS.decode(buf).data, grid.next_x, grid.next_y, grid.width, grid.height);
     if ( grid.next_x + grid.width >= grid.jpeg_w ) {
       grid.next_x = 0;
       grid.next_y += grid.height;
