@@ -74,6 +74,14 @@ Grid.prototype.count = function(v){
   return this._count;
 };
 
+Grid.prototype.rows = function(v){
+  if (arguments.length) {
+    this._rows = v;
+    return this;
+  }
+  return this._rows;
+};
+
 Grid.prototype.interval = function(v){
   if (arguments.length) {
     this._interval = v;
@@ -101,7 +109,7 @@ Grid.prototype.args = function(){
   argv.push('-vf', vf);
 
   // number of frames
-  argv.push('-vframes', this._count);
+  argv.push('-vframes', this.count());
 
   // ensure streaming output
   argv.push('-updatefirst', 1);
