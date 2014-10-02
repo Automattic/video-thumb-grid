@@ -68,8 +68,8 @@ function Grid(input, opts, fn){
   });
 
   ffmpeg.stdout.on('end', function() {
-    if (parser.count != grid.count) {
-      throw new Error('Not enough images. ' + parser.count + ' found, ' + grid.count + ' expected');
+    if (parser.count > grid.count) {
+      throw new Error('Too many images. ' + parser.count + ' found, ' + grid.count + ' expected');
     }
 
     if (parser.jpeg) {
