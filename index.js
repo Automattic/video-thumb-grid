@@ -125,8 +125,11 @@ Grid.prototype.render = function(fn){
   var args = this.args();
   var width = this.width();
   var height = this.height();
+
   var total_w = width * Math.ceil(this.count() / this.rows());
   var total_h = height * this.rows();
+  debug('result jpeg size %dx%d', total_w, total_h);
+
   var jpeg = new JPEGStack(total_w, total_h, 'rgba');
   var x = 0, y = 0;
 
