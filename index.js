@@ -22,6 +22,7 @@ function Grid(input, fn){
   this._height = 144;
   this._start = 0;
   this._rows = Math.ceil(Math.sqrt(this._count));
+  this._cmd = 'ffmpeg';
 
   this.parser = new JPEGStream;
 }
@@ -90,6 +91,14 @@ Grid.prototype.interval = function(v){
   return this._interval;
 };
 
+Grid.prototype.cmd = function(v){
+  if (arguments.length) {
+    this._cmd = v;
+    return this;
+  }
+  return this._cmd;
+};
+
 Grid.prototype.args = function(){
   var argv = [];
 
@@ -138,7 +147,7 @@ Grid.prototype.render = function(fn){
   var x = 0, y = 0;
 
   debug('running ffmpeg with "%s"', args.join(' '));
-  this.proc = spawn('ffmpeg', args);
+  this.proc = spawn(this.cmd(), args);
   this.proc.stdout
   .pipe(this.parser)
   .on('data', function(buf) {
