@@ -76,7 +76,7 @@ Defaults to `192`.
 ### Grid#height()
 
 Returns the height of each individual thumb in the grid.
-Defaults to `192`.
+Defaults to `144`.
 
 ### Grid#height(Number h)
 
@@ -113,6 +113,15 @@ Defaults to `1`.
 ### Grid#abort
 
 - Aborts the `ffmpeg` process, if ongoing, or the grid composition.
+- Returns the `Grid` instance object.
+
+### Grid#cmd()
+
+Returns the program that will be called. Defaults to `ffmpeg`.
+
+### Grid#cmd(String cmd)
+
+- Sets the program that will be run to `cmd`.
 - Returns the `Grid` instance object.
 
 ## Notes:
