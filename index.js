@@ -2,7 +2,7 @@ var spawn = require('child_process').spawn;
 var JPEGStream = require('jpeg-stream');
 var JPEGStack = require('jpeg').FixedJpegStack;
 var time = require('timecodeutils');
-var decode = require('jpeg-js').decode;
+var decode = require('picha').decodeJpeg;
 var debug = require('debug')('video-thumb-grid');
 
 module.exports = Grid;
@@ -130,7 +130,7 @@ Grid.prototype.render = function(fn){
   var total_h = height * this.rows();
   debug('result jpeg size %dx%d', total_w, total_h);
 
-  var jpeg = new JPEGStack(total_w, total_h, 'rgba');
+  var jpeg = new JPEGStack(total_w, total_h, 'rgb');
   var x = 0, y = 0;
 
   debug('running ffmpeg with "%s"', args.join(' '));
@@ -143,19 +143,21 @@ Grid.prototype.render = function(fn){
 
     // decode
     debug('decoding jpeg thumb');
-    var rgba = decode(buf).data;
+    decode(buf, function(err, img){
+      if (err) return fn(err);
+      debug('adding buffer');
 
-    // add thumb
-    debug('adding buffer');
-    jpeg.push(rgba, x, y, width, height);
+      // add thumb
+      jpeg.push(img.data, x, y, width, height);
 
-    // calculate next x/y
-    if (x + self.width() >= total_w) {
-      x = 0;
-      y += height;
-    } else {
-      x += width;
-    }
+      // calculate next x/y
+      if (x + self.width() >= total_w) {
+        x = 0;
+        y += height;
+      } else {
+        x += width;
+      }
+    });
   });
 
   this.proc.once('error', function(err){
