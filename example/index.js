@@ -7,6 +7,7 @@ var file = grid('sample.mov');
 file.count(64);
 file.interval(1);
 file.render(function(err, buf){
+  if (err) throw err;
   var out = join(__dirname, 'grid.jpg');
   write(out, buf);
   exec('open ' + out, function(err){
