@@ -111,6 +111,9 @@ Grid.prototype.args = function(){
   // number of frames
   argv.push('-vframes', this.count());
 
+  // quality of the frames
+  argv.push('-q', this.vquality());
+
   // ensure streaming output
   argv.push('-updatefirst', 1);
 
@@ -131,6 +134,7 @@ Grid.prototype.render = function(fn){
   debug('result jpeg size %dx%d', total_w, total_h);
 
   var jpeg = new JPEGStack(total_w, total_h, 'rgba');
+  jpeg.setQuality(this.quality());
   var x = 0, y = 0;
 
   debug('running ffmpeg with "%s"', args.join(' '));
