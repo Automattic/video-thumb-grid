@@ -76,7 +76,7 @@ Defaults to `192`.
 ### Grid#height()
 
 Returns the height of each individual thumb in the grid.
-Defaults to `192`.
+Defaults to `144`.
 
 ### Grid#height(Number h)
 
