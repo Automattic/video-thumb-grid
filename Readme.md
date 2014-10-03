@@ -115,6 +115,15 @@ Defaults to `1`.
 - Aborts the `ffmpeg` process, if ongoing, or the grid composition.
 - Returns the `Grid` instance object.
 
+### Grid#cmd()
+
+Returns the program that will be called. Defaults to `ffmpeg`.
+
+### Grid#cmd(String cmd)
+
+- Sets the program that will be run to `cmd`.
+- Returns the `Grid` instance object.
+
 ## Notes:
 
 - If the `interval` and `start` combination can't possibly meet `count`
