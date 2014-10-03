@@ -186,6 +186,7 @@ Grid.prototype.render = function(fn){
     if (self._error) return debug('errored');
     if (self._aborted) return debug('aborted');
     if (self.parser.jpeg) return fn(new Error('JPEG end was expected.'));
+    if (0 == self.parser.count) return fn(new Error('No JPEGs.'));
     debug('jpeg encode');
     jpeg.encode(function(buf){
       fn(null, buf);
