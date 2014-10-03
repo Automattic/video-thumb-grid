@@ -175,10 +175,13 @@ Grid.prototype.render = function(fn){
       fn(null, buf);
     });
   });
+
+  return this;
 };
 
 Grid.prototype.abort = function(){
   debug('aborting');
   this._aborted = true;
   this.proc.kill('SIGHUP');
+  return this;
 };

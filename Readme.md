@@ -103,6 +103,18 @@ Defaults to `1`.
 - Sets the `ffmpeg` video quality.
 - Returns the `Grid` instance object.
 
+### Grid#render(Function fn)
+
+- Triggers the thumbnailing process
+- Calls `fn` with `err, buf`, `buf` being the resulting JPEG grid.
+- Can be aborted by calling `Grid#abort`.
+- Returns the `Grid` instance object.
+
+### Grid#abort
+
+- Aborts the `ffmpeg` process, if ongoing, or the grid composition.
+- Returns the `Grid` instance object.
+
 ## Notes:
 
 - If the `interval` and `start` combination can't possibly meet `count`
