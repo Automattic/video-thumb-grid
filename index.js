@@ -184,12 +184,9 @@ Grid.prototype.render = function(fn){
     debug('stderr %s', data);
   });
 
-  this.proc.once('error', function(err){
-    debug('error %s', err.stack);
-    if (self._aborted) return debug('aborted');
-    self._error = true;
-    fn(err);
-  });
+  this.proc.stdin.once('error', onerror);
+  this.proc.stdout.once('error', onerror);
+  this.proc.once('error', onerror);
 
   this.proc.stdout.on('end', function(){
     debug('stdout end');
@@ -206,6 +203,13 @@ Grid.prototype.render = function(fn){
   this.proc.on('exit', function(code) {
     debug('proc exit (%d)', code);
   });
+
+  function onerror(err){
+    debug('error %s', err.stack);
+    if (self._aborted) return debug('aborted');
+    self._error = true;
+    fn(err);
+  }
 
   return this;
 };
