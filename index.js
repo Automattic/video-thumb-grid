@@ -176,6 +176,10 @@ Grid.prototype.render = function(fn){
     });
   });
 
+  this.proc.stderr.on('data', function(data){
+    debug('stderr %s', data);
+  });
+
   this.proc.once('error', function(err){
     debug('error %s', err.stack);
     if (self._aborted) return debug('aborted');
