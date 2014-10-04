@@ -1,8 +1,11 @@
 var spawn = require('child_process').spawn;
+var PixelStack = require('pixel-stack');
 var JPEGStream = require('jpeg-stream');
-var JPEGStack = require('jpeg').FixedJpegStack;
 var time = require('timecodeutils');
-var decode = require('picha').decodeJpeg;
+var picha = require('picha');
+var Image = picha.Image;
+var encode = picha.encodeJpeg;
+var decode = picha.decodeJpeg;
 var debug = require('debug')('video-thumb-grid');
 
 module.exports = Grid;
@@ -24,7 +27,7 @@ function Grid(input, fn){
   this._rows = null;
   this._cmd = 'ffmpeg';
 
-  this.parser = new JPEGStream;
+  this._parser = new JPEGStream;
 }
 
 Grid.prototype.start = function(v){
@@ -146,8 +149,8 @@ Grid.prototype.render = function(fn){
   var total_h = height * this.rows();
   debug('result jpeg size %dx%d', total_w, total_h);
 
-  var jpeg = new JPEGStack(total_w, total_h, 'rgb');
-  jpeg.setQuality(this.quality());
+  var stack = new PixelStack(total_w, total_h);
+  stack.fill([255,255,255]);
 
   var x = 0, y = 0;
 
@@ -156,7 +159,7 @@ Grid.prototype.render = function(fn){
   this._input.pipe(this.proc.stdin);
 
   this.proc.stdout
-  .pipe(this.parser)
+  .pipe(this._parser)
   .on('data', function(buf) {
     // grid is full
     if (y >= total_h) return;
@@ -168,7 +171,7 @@ Grid.prototype.render = function(fn){
       debug('adding buffer');
 
       // add thumb
-      jpeg.push(img.data, x, y, width, height);
+      stack.push(img.data, width, height, x, y);
 
       // calculate next x/y
       if (x + self.width() >= total_w) {
@@ -196,12 +199,18 @@ Grid.prototype.render = function(fn){
 
     if (self._error) return debug('errored');
     if (self._aborted) return debug('aborted');
-    if (self.parser.jpeg) return fn(new Error('JPEG end was expected.'));
-    if (0 == self.parser.count) return fn(new Error('No JPEGs.'));
-    debug('jpeg encode');
-    jpeg.encode(function(buf){
-      fn(null, buf);
+    if (self._parser.jpeg) return fn(new Error('JPEG end was expected.'));
+    if (0 == self._parser.count) return fn(new Error('No JPEGs.'));
+
+    var image = new Image({
+      width: total_w,
+      height: total_h,
+      data: stack.buffer(),
+      pixel: 'rgb'
     });
+
+    debug('jpeg encode');
+    encode(image, { quality: self.quality() }, fn);
   });
 
   this.proc.on('exit', function(code) {
