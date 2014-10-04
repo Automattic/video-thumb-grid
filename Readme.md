@@ -45,8 +45,7 @@ Returns the number of rows in the grid. Defaults to the creating a
 
 ### Grid#interval()
 
-Returns the number of rows in the grid. Defaults to calculating the
-square root of `count` rounded upwards.
+Returns how many seconds to wait between thumbs. Defaults to `1`.
 
 ### Grid#interval(Number int)
 
