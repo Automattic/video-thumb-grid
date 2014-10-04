@@ -21,7 +21,7 @@ function Grid(input, fn){
   this._width = 192;
   this._height = 144;
   this._start = 0;
-  this._rows = Math.ceil(Math.sqrt(this._count));
+  this._rows = null;
   this._cmd = 'ffmpeg';
 
   this.parser = new JPEGStream;
@@ -80,7 +80,11 @@ Grid.prototype.rows = function(v){
     this._rows = v;
     return this;
   }
-  return this._rows;
+  if ( !this._rows) {
+    return Math.ceil(Math.sqrt(this.count()));
+  } else {
+    return this._rows;
+  }
 };
 
 Grid.prototype.interval = function(v){
