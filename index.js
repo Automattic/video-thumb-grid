@@ -190,6 +190,10 @@ Grid.prototype.render = function(fn){
 
   this.proc.stdout.on('end', function(){
     debug('stdout end');
+
+    self._input.unpipe();
+    self.proc.stdin.destroy();
+
     if (self._error) return debug('errored');
     if (self._aborted) return debug('aborted');
     if (self.parser.jpeg) return fn(new Error('JPEG end was expected.'));
