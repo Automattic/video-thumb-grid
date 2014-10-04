@@ -80,7 +80,7 @@ Grid.prototype.rows = function(v){
     this._rows = v;
     return this;
   }
-  if ( !this._rows) {
+  if (!this._rows) {
     return Math.ceil(Math.sqrt(this.count()));
   } else {
     return this._rows;
