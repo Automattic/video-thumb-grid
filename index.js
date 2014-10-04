@@ -103,7 +103,7 @@ Grid.prototype.args = function(){
   var argv = [];
 
   // input stream
-  argv.push('-i', this._input);
+  argv.push('-i', 'pipe:0');
 
   // seek
   argv.push('-ss', time.secondsToTC(this.start()));
@@ -149,6 +149,8 @@ Grid.prototype.render = function(fn){
 
   debug('running ffmpeg with "%s"', args.join(' '));
   this.proc = spawn(this.cmd(), args);
+  this._input.pipe(this.proc.stdin);
+
   this.proc.stdout
   .pipe(this.parser)
   .on('data', function(buf) {
