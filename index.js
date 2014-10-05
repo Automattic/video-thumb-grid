@@ -14,7 +14,13 @@ function Grid(input, fn){
   if (!(this instanceof Grid)) return new Grid(input, fn);
 
   // input stream
-  this._input = input;
+  if ('string' == typeof input) {
+    this._path = input;
+  } else if (input.pipe) {
+    this._stream = input;
+  } else {
+    throw new Error('String or Stream input expected');
+  }
 
   // config
   this._count = 100;
@@ -110,7 +116,7 @@ Grid.prototype.args = function(){
   var argv = [];
 
   // input stream
-  argv.push('-i', 'pipe:0');
+  argv.push('-i', this._path || 'pipe:0');
 
   // seek
   argv.push('-ss', time.secondsToTC(this.start()));
@@ -159,7 +165,10 @@ Grid.prototype.render = function(fn){
 
   debug('running ffmpeg with "%s"', args.join(' '));
   this.proc = spawn(this.cmd(), args);
-  this._input.pipe(this.proc.stdin);
+
+  if (this._stream) {
+    this._stream.pipe(this.proc.stdin);
+  }
 
   var count = 0;
   this.proc.stdout
@@ -186,7 +195,9 @@ Grid.prototype.render = function(fn){
       }
     });
 
-    if (++count == self.count()) self._input.unpipe(self.proc);
+    if (++count == self.count() && self._stream) {
+      self._stream.unpipe(self.proc);
+    }
   });
 
   this.proc.stderr.on('data', function(data){
@@ -208,8 +219,7 @@ Grid.prototype.render = function(fn){
   this.proc.stdout.on('end', function(){
     debug('stdout end');
 
-    self._input.unpipe(self.proc);
-
+    if (self._stream) self._stream.unpipe(self.proc);
     if (self._error) return debug('errored');
     if (self._aborted) return debug('aborted');
     if (self._parser.jpeg) return fn(new Error('JPEG end was expected.'));
@@ -244,7 +254,7 @@ Grid.prototype.render = function(fn){
 Grid.prototype.abort = function(){
   debug('aborting');
   this._aborted = true;
-  this._input.unpipe(this.proc);
+  if (this._stream) this._stream.unpipe(this.proc);
   this.proc.kill('SIGHUP');
   return this;
 };

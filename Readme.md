@@ -24,6 +24,10 @@ grid.render(function(err, buf){
 
 Constructs a new `Grid` with the given `input` `Readable` stream.
 
+### Grid(String input)
+
+Constructs a new `Grid` with the given `input` fs path.
+
 ### Grid#count()
 
 Returns the number of thumbnails to generate. Defaults to `100`.
