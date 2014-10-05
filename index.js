@@ -119,9 +119,10 @@ Grid.prototype.args = function(){
   argv.push('-f', 'image2');
 
   // resize and crop
-  var vf =  'fps=1/' + this.interval() + ",scale='max(" + this.width()
-    + ',a*' + this.height() + ")':'max(" + this.height() + ','
-    + this.width() + "/a)',crop=" + this.width() + ':' + this.height();
+  var w = this.width();
+  var h = this.height();
+  var vf =  'fps=1/' + this.interval() + ",scale='max(" + w + ',a*'
+    + h + ")':'max(" + h + ',' + w + "/a)',crop=" + w + ':' + h;
   argv.push('-vf', vf);
 
   // number of frames
