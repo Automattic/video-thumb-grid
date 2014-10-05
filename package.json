@@ -1,6 +1,6 @@
 {
   "name": "video-thumb-grid",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Generates a sprite grid of video thumbnails using `ffmpeg`.",
   "dependencies": {
     "debug": "2.0.0",
