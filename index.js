@@ -244,6 +244,7 @@ Grid.prototype.render = function(fn){
 Grid.prototype.abort = function(){
   debug('aborting');
   this._aborted = true;
+  this._input.unpipe(this.proc);
   this.proc.kill('SIGHUP');
   return this;
 };
