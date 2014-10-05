@@ -159,6 +159,7 @@ Grid.prototype.render = function(fn){
   this.proc = spawn(this.cmd(), args);
   this._input.pipe(this.proc.stdin);
 
+  var count = 0;
   this.proc.stdout
   .pipe(this._parser)
   .on('data', function(buf) {
@@ -182,6 +183,14 @@ Grid.prototype.render = function(fn){
         x += width;
       }
     });
+
+    if (++count == self.count()) {
+      // stop piping
+      self._input.unpipe();
+
+      // prevent EPIPE
+      self.proc.stdin.destroy();
+    }
   });
 
   this.proc.stderr.on('data', function(data){
@@ -194,9 +203,6 @@ Grid.prototype.render = function(fn){
 
   this.proc.stdout.on('end', function(){
     debug('stdout end');
-
-    self._input.unpipe();
-    self.proc.stdin.destroy();
 
     if (self._error) return debug('errored');
     if (self._aborted) return debug('aborted');
