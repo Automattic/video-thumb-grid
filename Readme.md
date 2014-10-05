@@ -123,6 +123,10 @@ Returns the program that will be called. Defaults to `ffmpeg`.
 - Sets the program that will be run to `cmd`.
 - Returns the `Grid` instance object.
 
+### Grid#proc
+
+- Property that holds the `ffmpeg` `ChildProcess`.
+
 ## Notes:
 
 - If the `interval` and `start` combination can't possibly meet `count`
