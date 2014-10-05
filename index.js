@@ -141,6 +141,8 @@ Grid.prototype.args = function(){
 };
 
 Grid.prototype.render = function(fn){
+  fn = fn || empty;
+
   var self = this;
   var args = this.args();
   var width = this.width();
@@ -240,3 +242,5 @@ Grid.prototype.abort = function(){
   this.proc.kill('SIGHUP');
   return this;
 };
+
+function empty(){}
