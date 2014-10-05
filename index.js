@@ -233,6 +233,7 @@ Grid.prototype.render = function(fn){
   function onerror(err){
     debug('error %s', err.stack);
     if (self._aborted) return debug('aborted');
+    if (self._error) return debug('ignored');
     self._error = true;
     fn(err);
   }
