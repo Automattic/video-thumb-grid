@@ -88,7 +88,7 @@ Defaults to `144`.
 
 ### Grid#quality()
 
-Returns the quality of the resulting JPEG. Defaults to `70`.
+Returns the quality of the resulting JPEG. Defaults to `50`.
 
 ### Grid#quality(Number q)
 

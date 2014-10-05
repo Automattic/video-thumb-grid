@@ -25,7 +25,7 @@ function Grid(input, fn){
   // config
   this._count = 100;
   this._interval = 1;
-  this._quality = 70;
+  this._quality = 50;
   this._vquality = 1;
   this._width = 192;
   this._height = 144;
