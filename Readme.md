@@ -140,7 +140,7 @@ Returns the program that will be called. Defaults to `ffmpeg`.
 ## Requirements
 
 - `ffmpeg` must be installed an available in `$PATH`
-- `libjpeg` needs to be installed for the `node-jpeg` dependency to build
+- `libjpeg` needs to be installed for the [picha](https://github.com/jhs67/picha) dependency to build
 
 ## Authors
 
