@@ -193,9 +193,17 @@ Grid.prototype.render = function(fn){
     debug('stderr %s', data);
   });
 
-  this.proc.stdin.once('error', onerror);
-  this.proc.stdout.once('error', onerror);
-  this.proc.once('error', onerror);
+  this.proc.stdin.on('error', function(err){
+    if ('EPIPE' == err.code) {
+      debug('ignore EPIPE');
+    } else {
+      onerror(err);
+    }
+  });
+
+  this.proc.stdout.on('error', onerror);
+  this.proc.stderr.on('error', onerror);
+  this.proc.on('error', onerror);
 
   this.proc.stdout.on('end', function(){
     debug('stdout end');
