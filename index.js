@@ -186,13 +186,7 @@ Grid.prototype.render = function(fn){
       }
     });
 
-    if (++count == self.count()) {
-      // stop piping
-      self._input.unpipe();
-
-      // prevent EPIPE
-      self.proc.stdin.destroy();
-    }
+    if (++count == self.count()) self._input.unpipe(self.proc);
   });
 
   this.proc.stderr.on('data', function(data){
