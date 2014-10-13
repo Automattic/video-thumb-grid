@@ -160,7 +160,6 @@ Grid.prototype.render = function(fn){
   debug('result jpeg size %dx%d', total_w, total_h);
 
   var stack = new PixelStack(total_w, total_h);
-  stack.fill([0,0,0]);
 
   var x = 0, y = 0;
 
