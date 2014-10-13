@@ -193,7 +193,7 @@ Grid.prototype.render = function(fn){
       stack.push(img.data, width, height, x, y);
 
       // calculate next x/y
-      if (x + self.width() >= total_w) {
+      if (x + width >= total_w) {
         x = 0;
         y += height;
       } else {
