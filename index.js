@@ -39,7 +39,7 @@ function Grid(input, fn){
 
 Grid.prototype.start = function(v){
   if (arguments.length) {
-    this._start = v;
+    this._start = parseInt(v);
     return this;
   }
   return this._start;
@@ -47,7 +47,7 @@ Grid.prototype.start = function(v){
 
 Grid.prototype.quality = function(v){
   if (arguments.length) {
-    this._quality = v;
+    this._quality = parseInt(v);
     return this;
   }
   return this._quality;
@@ -55,7 +55,7 @@ Grid.prototype.quality = function(v){
 
 Grid.prototype.vquality = function(v){
   if (arguments.length) {
-    this._vquality = v;
+    this._vquality = parseInt(v);
     return this;
   }
   return this._vquality;
@@ -63,7 +63,7 @@ Grid.prototype.vquality = function(v){
 
 Grid.prototype.width = function(v){
   if (arguments.length) {
-    this._width = v;
+    this._width = parseInt(v);
     return this;
   }
   return this._width;
@@ -71,7 +71,7 @@ Grid.prototype.width = function(v){
 
 Grid.prototype.height = function(v){
   if (arguments.length) {
-    this._height = v;
+    this._height = parseInt(v);
     return this;
   }
   return this._height;
@@ -79,7 +79,7 @@ Grid.prototype.height = function(v){
 
 Grid.prototype.count = function(v){
   if (arguments.length) {
-    this._count = v;
+    this._count = parseInt(v);
     return this;
   }
   return this._count;
@@ -87,7 +87,7 @@ Grid.prototype.count = function(v){
 
 Grid.prototype.rows = function(v){
   if (arguments.length) {
-    this._rows = v;
+    this._rows = parseInt(v);
     return this;
   }
   if (!this._rows) {
@@ -99,7 +99,7 @@ Grid.prototype.rows = function(v){
 
 Grid.prototype.interval = function(v){
   if (arguments.length) {
-    this._interval = v;
+    this._interval = parseInt(v);
     return this;
   }
   return this._interval;
