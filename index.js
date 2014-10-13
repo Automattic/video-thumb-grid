@@ -6,6 +6,7 @@ var picha = require('picha');
 var Image = picha.Image;
 var encode = picha.encodeJpeg;
 var decode = picha.decodeJpeg;
+var resize = picha.resizeSync;
 var debug = require('debug')('video-thumb-grid');
 
 module.exports = Grid;
@@ -38,7 +39,7 @@ function Grid(input, fn){
 
 Grid.prototype.start = function(v){
   if (arguments.length) {
-    this._start = v;
+    this._start = parseInt(v);
     return this;
   }
   return this._start;
@@ -46,7 +47,7 @@ Grid.prototype.start = function(v){
 
 Grid.prototype.quality = function(v){
   if (arguments.length) {
-    this._quality = v;
+    this._quality = parseInt(v);
     return this;
   }
   return this._quality;
@@ -54,7 +55,7 @@ Grid.prototype.quality = function(v){
 
 Grid.prototype.vquality = function(v){
   if (arguments.length) {
-    this._vquality = v;
+    this._vquality = parseInt(v);
     return this;
   }
   return this._vquality;
@@ -62,7 +63,7 @@ Grid.prototype.vquality = function(v){
 
 Grid.prototype.width = function(v){
   if (arguments.length) {
-    this._width = v;
+    this._width = parseInt(v);
     return this;
   }
   return this._width;
@@ -70,7 +71,7 @@ Grid.prototype.width = function(v){
 
 Grid.prototype.height = function(v){
   if (arguments.length) {
-    this._height = v;
+    this._height = parseInt(v);
     return this;
   }
   return this._height;
@@ -78,7 +79,7 @@ Grid.prototype.height = function(v){
 
 Grid.prototype.count = function(v){
   if (arguments.length) {
-    this._count = v;
+    this._count = parseInt(v);
     return this;
   }
   return this._count;
@@ -86,7 +87,7 @@ Grid.prototype.count = function(v){
 
 Grid.prototype.rows = function(v){
   if (arguments.length) {
-    this._rows = v;
+    this._rows = parseInt(v);
     return this;
   }
   if (!this._rows) {
@@ -98,7 +99,7 @@ Grid.prototype.rows = function(v){
 
 Grid.prototype.interval = function(v){
   if (arguments.length) {
-    this._interval = v;
+    this._interval = parseInt(v);
     return this;
   }
   return this._interval;
@@ -159,7 +160,6 @@ Grid.prototype.render = function(fn){
   debug('result jpeg size %dx%d', total_w, total_h);
 
   var stack = new PixelStack(total_w, total_h);
-  stack.fill([255,255,255]);
 
   var x = 0, y = 0;
 
@@ -177,23 +177,30 @@ Grid.prototype.render = function(fn){
     // grid is full
     if (y >= total_h) return;
 
+    var push_x = x;
+    var push_y = y;
+
     // decode
     debug('decoding jpeg thumb');
     decode(buf, function(err, img){
       if (err) return fn(err);
       debug('adding buffer');
+      // stretch the image if it's not large enough (due to ffmpeg scaling)
+      if (img.data.length != width * height * 3) {
+        img = resize(img, {width: width, height: height});
+      }
 
       // add thumb
-      stack.push(img.data, width, height, x, y);
-
-      // calculate next x/y
-      if (x + self.width() >= total_w) {
-        x = 0;
-        y += height;
-      } else {
-        x += width;
-      }
+      stack.push(img.data, width, height, push_x, push_y);
     });
+
+    // calculate next x/y
+    if (x + width >= total_w) {
+      x = 0;
+      y += height;
+    } else {
+      x += width;
+    }
 
     if (++count == self.count() && self._stream) {
       self._stream.unpipe(self.proc);
