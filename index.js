@@ -178,28 +178,30 @@ Grid.prototype.render = function(fn){
     // grid is full
     if (y >= total_h) return;
 
+    var push_x = x;
+    var push_y = y;
+
     // decode
     debug('decoding jpeg thumb');
     decode(buf, function(err, img){
       if (err) return fn(err);
       debug('adding buffer');
-
       // stretch the image if it's not large enough (due to ffmpeg scaling)
       if (img.data.length != width * height * 3) {
         img = resize(img, {width: width, height: height});
       }
 
       // add thumb
-      stack.push(img.data, width, height, x, y);
-
-      // calculate next x/y
-      if (x + width >= total_w) {
-        x = 0;
-        y += height;
-      } else {
-        x += width;
-      }
+      stack.push(img.data, width, height, push_x, push_y);
     });
+
+    // calculate next x/y
+    if (x + width >= total_w) {
+      x = 0;
+      y += height;
+    } else {
+      x += width;
+    }
 
     if (++count == self.count() && self._stream) {
       self._stream.unpipe(self.proc);
