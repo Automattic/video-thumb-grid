@@ -6,6 +6,7 @@ var picha = require('picha');
 var Image = picha.Image;
 var encode = picha.encodeJpeg;
 var decode = picha.decodeJpeg;
+var resize = picha.resizeSync;
 var debug = require('debug')('video-thumb-grid');
 
 module.exports = Grid;
@@ -182,6 +183,11 @@ Grid.prototype.render = function(fn){
     decode(buf, function(err, img){
       if (err) return fn(err);
       debug('adding buffer');
+
+      // stretch the image if it's not large enough (due to ffmpeg scaling)
+      if (img.data.length != width * height * 3) {
+        img = resize(img, {width: width, height: height});
+      }
 
       // add thumb
       stack.push(img.data, width, height, x, y);
