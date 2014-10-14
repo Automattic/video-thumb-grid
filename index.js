@@ -171,32 +171,46 @@ Grid.prototype.render = function(fn){
   }
 
   var count = 0;
+  var decoding = 0;
+  var total = this.count();
+
   this.proc.stdout
   .pipe(this._parser)
   .on('data', function(buf) {
-    // grid is full
-    if (y >= total_h) return;
+    // sometimes lingering `data` events
+    // are produced even after `unpipe` is called
+    if (!total || 0 == total - decoding) return;
+
+    var push_x = x;
+    var push_y = y;
 
     // decode
     debug('decoding jpeg thumb');
+    decoding++;
     decode(buf, function(err, img){
       if (err) return fn(err);
       debug('adding buffer');
-
-      // add thumb
-      stack.push(img.data, width, height, x, y);
-
-      // calculate next x/y
-      if (x + self.width() >= total_w) {
-        x = 0;
-        y += height;
-      } else {
-        x += width;
-      }
+      stack.push(img.data, width, height, push_x, push_y);
+      --decoding;
+      --total || complete();
     });
 
-    if (++count == self.count() && self._stream) {
-      self._stream.unpipe(self.proc);
+    if (x + width >= total_w) {
+      x = 0;
+      y += height;
+    } else {
+      x += width;
+    }
+  })
+  .on('end', function(){
+    if (decoding) {
+      debug('%d pending decoding', decoding);
+      // let the `decode` handler call `complete`
+      total = decoding;
+    } else if (total) {
+      var count = self.count();
+      debug('%d expected, but got %d', count, count - total);
+      complete();
     }
   });
 
@@ -218,6 +232,14 @@ Grid.prototype.render = function(fn){
 
   this.proc.stdout.on('end', function(){
     debug('stdout end');
+  });
+
+  this.proc.on('exit', function(code) {
+    debug('proc exit (%d)', code);
+  });
+
+  function complete(){
+    self._stream.unpipe(self.proc);
 
     if (self._stream) self._stream.unpipe(self.proc);
     if (self._error) return debug('errored');
@@ -234,11 +256,8 @@ Grid.prototype.render = function(fn){
 
     debug('jpeg encode');
     encode(image, { quality: self.quality() }, fn);
-  });
+  }
 
-  this.proc.on('exit', function(code) {
-    debug('proc exit (%d)', code);
-  });
 
   function onerror(err){
     debug('error %s', err.stack);
