@@ -191,7 +191,7 @@ Grid.prototype.render = function(fn){
       }
 
       // add thumb
-      stack.push(img.data, width, height, push_x, push_y);
+      stack.push(img.data, width, height, push_x, push_y, img.stride);
     });
 
     // calculate next x/y
@@ -236,7 +236,8 @@ Grid.prototype.render = function(fn){
       width: total_w,
       height: total_h,
       data: stack.buffer(),
-      pixel: 'rgb'
+      pixel: 'rgb',
+      stride: total_w * 3
     });
 
     debug('jpeg encode');
