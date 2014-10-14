@@ -185,8 +185,9 @@ Grid.prototype.render = function(fn){
     decode(buf, function(err, img){
       if (err) return fn(err);
       debug('adding buffer');
+
       // stretch the image if it's not large enough (due to ffmpeg scaling)
-      if (img.data.length != width * height * 3) {
+      if (img.width != width || img.height != height) {
         img = resize(img, {width: width, height: height});
       }
 
