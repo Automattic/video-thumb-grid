@@ -159,8 +159,6 @@ Grid.prototype.render = function(fn){
   debug('result jpeg size %dx%d', total_w, total_h);
 
   var stack = new PixelStack(total_w, total_h);
-  stack.fill([255,255,255]);
-
   var x = 0, y = 0;
 
   debug('running ffmpeg with "%s"', args.join(' '));
@@ -190,7 +188,7 @@ Grid.prototype.render = function(fn){
     decode(buf, function(err, img){
       if (err) return fn(err);
       debug('adding buffer');
-      stack.push(img.data, width, height, push_x, push_y);
+      stack.push(img.data, img.width, img.height, push_x, push_y, img.stride);
       --decoding;
       --total || complete();
     });
@@ -251,7 +249,8 @@ Grid.prototype.render = function(fn){
       width: total_w,
       height: total_h,
       data: stack.buffer(),
-      pixel: 'rgb'
+      pixel: 'rgb',
+      stride: total_w * 3
     });
 
     debug('jpeg encode');
