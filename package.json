@@ -6,7 +6,7 @@
     "debug": "2.0.0",
     "jpeg-stream": "0.1.0",
     "picha": "0.4.4",
-    "pixel-stack": "0.1.0",
+    "pixel-stack": "0.2.0",
     "timecodeutils": "0.0.1"
   }
 }
