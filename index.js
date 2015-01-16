@@ -219,6 +219,8 @@ Grid.prototype.render = function(fn){
   this.proc.stdin.on('error', function(err){
     if ('EPIPE' == err.code) {
       debug('ignore EPIPE');
+    } else if ('ECONNRESET' == err.code) {
+      debug('ignore ECONNRESET');
     } else {
       onerror(err);
     }
