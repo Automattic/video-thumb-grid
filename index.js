@@ -119,11 +119,11 @@ Grid.prototype.cmd = function(v){
 Grid.prototype.args = function(){
   var argv = [];
 
-  // input stream
-  argv.push('-i', this._path || 'pipe:0');
-
   // seek
   argv.push('-ss', time.secondsToTC(this.start()));
+
+  // input stream
+  argv.push('-i', this._path || 'pipe:0');
 
   // format
   argv.push('-f', 'image2');
