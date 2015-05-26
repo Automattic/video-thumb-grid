@@ -11,6 +11,8 @@ var debug = require('debug')('video-thumb-grid');
 module.exports = Grid;
 
 function Grid(input, fn){
+  this.gridStart = process.hrtime();
+
   if (!(this instanceof Grid)) return new Grid(input, fn);
 
   // input stream
@@ -34,6 +36,8 @@ function Grid(input, fn){
   this._cmd = 'ffmpeg';
 
   this._parser = new JPEGStream;
+
+  this.ffmpegStart = null;
 }
 
 Grid.prototype.start = function(v){
@@ -115,11 +119,11 @@ Grid.prototype.cmd = function(v){
 Grid.prototype.args = function(){
   var argv = [];
 
-  // input stream
-  argv.push('-i', this._path || 'pipe:0');
-
   // seek
   argv.push('-ss', time.secondsToTC(this.start()));
+
+  // input stream
+  argv.push('-i', this._path || 'pipe:0');
 
   // format
   argv.push('-f', 'image2');
@@ -162,6 +166,7 @@ Grid.prototype.render = function(fn){
   var x = 0, y = 0;
 
   debug('running ffmpeg with "%s"', args.join(' '));
+  this.ffmpegStart = process.hrtime();
   this.proc = spawn(this.cmd(), args);
 
   if (this._stream) {
@@ -235,6 +240,9 @@ Grid.prototype.render = function(fn){
   });
 
   this.proc.on('exit', function(code) {
+    var ffmpegEnd = process.hrtime(self.ffmpegStart);
+    debug('ffmpeg execution time: %ds %dms', ffmpegEnd[0], ffmpegEnd[1]/1000000);
+
     debug('proc exit (%d)', code);
   });
 
@@ -257,6 +265,9 @@ Grid.prototype.render = function(fn){
 
     debug('jpeg encode');
     encode(image, { quality: self.quality() }, fn);
+
+    var gridEnd = process.hrtime(self.gridStart);
+    debug('grid execution time: %ds %dms', gridEnd[0], gridEnd[1]/1000000);
   }
 
 

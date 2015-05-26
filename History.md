@@ -1,4 +1,10 @@
 
+0.2.2 / 2015-05-26
+==================
+
+  * Swap the order of `-i` and `-ss`. When used as an input option (before -i), seeks in this input file to position. When used as an output option (before an output filename), decodes but discards input until the timestamps reach position. This is slower, but more accurate.
+  * Add timer debugs to see how long grid and ffmpeg take.
+
 0.2.1 / 2015-02-19
 ==================
 
