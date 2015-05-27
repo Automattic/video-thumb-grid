@@ -1,4 +1,9 @@
 
+0.2.3 / 2015-05-27
+==================
+
+  * When the seek value comes before the input stream, it fails with a seek value of 0. Only set a seek value if there is one.
+
 0.2.2 / 2015-05-26
 ==================
 
