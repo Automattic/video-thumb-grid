@@ -120,7 +120,7 @@ Grid.prototype.args = function(){
   var argv = [];
 
   // seek
-  argv.push('-ss', time.secondsToTC(this.start()));
+  if (this.start() > 0) argv.push('-ss', time.secondsToTC(this.start()));
 
   // input stream
   argv.push('-i', this._path || 'pipe:0');
