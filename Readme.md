@@ -3,6 +3,8 @@
 
 Generates a sprite grid of video thumbnails using `ffmpeg`.
 
+![](https://thumbs.videopress.com/kUJmAcSf?w=80&h=40&i=6&s=0&c=64&vq=1&q=90)
+
 ## How to use
 
 ```js
