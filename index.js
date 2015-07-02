@@ -6,7 +6,9 @@ var picha = require('picha');
 var Image = picha.Image;
 var encode = picha.encodeJpeg;
 var decode = picha.decodeJpeg;
-var debug = require('debug')('video-thumb-grid');
+var debugError = require('debug')('video-thumb-grid-error');
+var debugInfo = require('debug')('video-thumb-grid-info');
+var util = require('util');
 
 module.exports = Grid;
 
@@ -34,6 +36,7 @@ function Grid(input, fn){
   this._start = 0;
   this._rows = null;
   this._cmd = 'ffmpeg';
+  this._debugprefix = '';
 
   this._parser = new JPEGStream;
 
@@ -116,6 +119,14 @@ Grid.prototype.cmd = function(v){
   return this._cmd;
 };
 
+Grid.prototype.debugprefix = function(v){
+  if (arguments.length) {
+    this._debugprefix = v + ': ';
+    return this;
+  }
+  return this._debugprefix;
+};
+
 Grid.prototype.args = function(){
   var argv = [];
 
@@ -160,12 +171,12 @@ Grid.prototype.render = function(fn){
 
   var total_w = width * Math.ceil(this.count() / this.rows());
   var total_h = height * this.rows();
-  debug('result jpeg size %dx%d', total_w, total_h);
+  this.debug(util.format('result jpeg size %dx%d', total_w, total_h), 'info');
 
   var stack = new PixelStack(total_w, total_h);
   var x = 0, y = 0;
 
-  debug('running ffmpeg with "%s"', args.join(' '));
+  this.debug(util.format('running ffmpeg with "%s"', args.join(' ')), 'info');
   this.ffmpegStart = process.hrtime();
   this.proc = spawn(this.cmd(), args);
 
@@ -188,11 +199,11 @@ Grid.prototype.render = function(fn){
     var push_y = y;
 
     // decode
-    debug('decoding jpeg thumb');
+    self.debug('decoding jpeg thumb', 'info');
     decoding++;
     decode(buf, function(err, img){
       if (err) return fn(err);
-      debug('adding buffer');
+      self.debug('adding buffer', 'info');
       stack.push(img.data, img.width, img.height, push_x, push_y, img.stride);
       --decoding;
       --total || complete();
@@ -207,25 +218,25 @@ Grid.prototype.render = function(fn){
   })
   .on('end', function(){
     if (decoding) {
-      debug('%d pending decoding', decoding);
+      self.debug(util.format('%d pending decoding', decoding), 'info');
       // let the `decode` handler call `complete`
       total = decoding;
     } else if (total) {
       var count = self.count();
-      debug('%d expected, but got %d', count, count - total);
+      self.debug(util.format('%d expected, but got %d', count, count - total), 'error');
       complete();
     }
   });
 
   this.proc.stderr.on('data', function(data){
-    debug('stderr %s', data);
+    self.debug(util.format('stderr %s', data), 'error');
   });
 
   this.proc.stdin.on('error', function(err){
     if ('EPIPE' == err.code) {
-      debug('ignore EPIPE');
+      self.debug('ignore EPIPE', 'error');
     } else if ('ECONNRESET' == err.code) {
-      debug('ignore ECONNRESET');
+      self.debug('ignore ECONNRESET', 'error');
     } else {
       onerror(err);
     }
@@ -236,22 +247,22 @@ Grid.prototype.render = function(fn){
   this.proc.on('error', onerror);
 
   this.proc.stdout.on('end', function(){
-    debug('stdout end');
+    self.debug('stdout end', 'info');
   });
 
   this.proc.on('exit', function(code) {
     var ffmpegEnd = process.hrtime(self.ffmpegStart);
-    debug('ffmpeg execution time: %ds %dms', ffmpegEnd[0], ffmpegEnd[1]/1000000);
+    self.debug(util.format('ffmpeg execution time: %ds %dms', ffmpegEnd[0], ffmpegEnd[1]/1000000), 'info');
 
-    debug('proc exit (%d)', code);
+    self.debug(util.format('proc exit (%d)', code), 'info');
   });
 
   function complete(){
     self._stream.unpipe(self.proc);
 
     if (self._stream) self._stream.unpipe(self.proc);
-    if (self._error) return debug('errored');
-    if (self._aborted) return debug('aborted');
+    if (self._error) return this.debug('errored', 'error');
+    if (self._aborted) return this.debug('aborted', 'error');
     if (self._parser.jpeg) return fn(new Error('JPEG end was expected.'));
     if (0 == self._parser.count) return fn(new Error('No JPEGs.'));
 
@@ -263,18 +274,18 @@ Grid.prototype.render = function(fn){
       stride: total_w * 3
     });
 
-    debug('jpeg encode');
+    self.debug('jpeg encode', 'info');
     encode(image, { quality: self.quality() }, fn);
 
     var gridEnd = process.hrtime(self.gridStart);
-    debug('grid execution time: %ds %dms', gridEnd[0], gridEnd[1]/1000000);
+    self.debug(util.format('grid execution time: %ds %dms', gridEnd[0], gridEnd[1]/1000000), 'info');
   }
 
 
   function onerror(err){
-    debug('error %s', err.stack);
-    if (self._aborted) return debug('aborted');
-    if (self._error) return debug('ignored');
+    self.debug(util.format('error %s', err.stack), 'error');
+    if (self._aborted) return self.debug('aborted', 'error');
+    if (self._error) return self.debug('ignored', 'error');
     self._error = true;
     fn(err);
   }
@@ -283,11 +294,18 @@ Grid.prototype.render = function(fn){
 };
 
 Grid.prototype.abort = function(){
-  debug('aborting');
+  this.debug('aborting', 'error');
   this._aborted = true;
   if (this._stream) this._stream.unpipe(this.proc);
   this.proc.kill('SIGHUP');
   return this;
 };
+
+Grid.prototype.debug = function(message, type) {
+  if ('info' == type)
+    debugInfo('%s%s', this._debugprefix, message);
+  else
+    debugError('%s%s', this._debugprefix, message);
+}
 
 function empty(){}
