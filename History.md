@@ -1,4 +1,12 @@
 
+0.2.4 / 2015-07-02
+==================
+
+  * Add a timeout for `ffmpeg` so it does not run too long.
+  * Better separation of general "info" debug, debug from `ffmpeg`, and `console.error` for real errors.
+  * Introduce a debugprefix which is useful when running on a server accepting many requests.
+  * Added image
+
 0.2.3 / 2015-05-27
 ==================
 
