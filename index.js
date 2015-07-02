@@ -6,7 +6,7 @@ var picha = require('picha');
 var Image = picha.Image;
 var encode = picha.encodeJpeg;
 var decode = picha.decodeJpeg;
-var debugError = require('debug')('video-thumb-grid-error');
+var debugFfmpeg = require('debug')('video-thumb-grid-ffmpeg');
 var debugInfo = require('debug')('video-thumb-grid-info');
 var util = require('util');
 
@@ -223,20 +223,20 @@ Grid.prototype.render = function(fn){
       total = decoding;
     } else if (total) {
       var count = self.count();
-      self.debug(util.format('%d expected, but got %d', count, count - total), 'error');
+      self.debug(util.format('%d expected, but got %d', count, count - total), 'info');
       complete();
     }
   });
 
   this.proc.stderr.on('data', function(data){
-    self.debug(util.format('stderr %s', data), 'error');
+    self.debug(util.format('stderr %s', data), 'ffmpeg');
   });
 
   this.proc.stdin.on('error', function(err){
     if ('EPIPE' == err.code) {
-      self.debug('ignore EPIPE', 'error');
+      self.debug('ignore EPIPE', 'ffmpeg');
     } else if ('ECONNRESET' == err.code) {
-      self.debug('ignore ECONNRESET', 'error');
+      self.debug('ignore ECONNRESET', 'ffmpeg');
     } else {
       onerror(err);
     }
@@ -252,17 +252,17 @@ Grid.prototype.render = function(fn){
 
   this.proc.on('exit', function(code) {
     var ffmpegEnd = process.hrtime(self.ffmpegStart);
-    self.debug(util.format('ffmpeg execution time: %ds %dms', ffmpegEnd[0], ffmpegEnd[1]/1000000), 'info');
+    self.debug(util.format('ffmpeg execution time: %ds %dms', ffmpegEnd[0], ffmpegEnd[1]/1000000), 'ffmpeg');
 
-    self.debug(util.format('proc exit (%d)', code), 'info');
+    self.debug(util.format('proc exit (%d)', code), 'ffmpeg');
   });
 
   function complete(){
     self._stream.unpipe(self.proc);
 
     if (self._stream) self._stream.unpipe(self.proc);
-    if (self._error) return this.debug('errored', 'error');
-    if (self._aborted) return this.debug('aborted', 'error');
+    if (self._error) return this.debug('errored', 'info');
+    if (self._aborted) return this.debug('aborted', 'info');
     if (self._parser.jpeg) return fn(new Error('JPEG end was expected.'));
     if (0 == self._parser.count) return fn(new Error('No JPEGs.'));
 
@@ -283,9 +283,9 @@ Grid.prototype.render = function(fn){
 
 
   function onerror(err){
-    self.debug(util.format('error %s', err.stack), 'error');
-    if (self._aborted) return self.debug('aborted', 'error');
-    if (self._error) return self.debug('ignored', 'error');
+    console.error('error %s', err.stack);
+    if (self._aborted) return self.debug('aborted', 'info');
+    if (self._error) return self.debug('errored', 'info');
     self._error = true;
     fn(err);
   }
@@ -294,7 +294,7 @@ Grid.prototype.render = function(fn){
 };
 
 Grid.prototype.abort = function(){
-  this.debug('aborting', 'error');
+  this.debug('aborting', 'info');
   this._aborted = true;
   if (this._stream) this._stream.unpipe(this.proc);
   this.proc.kill('SIGHUP');
@@ -302,10 +302,10 @@ Grid.prototype.abort = function(){
 };
 
 Grid.prototype.debug = function(message, type) {
-  if ('info' == type)
-    debugInfo('%s%s', this._debugprefix, message);
+  if ('ffmpeg' == type)
+    debugFfmpeg('%s%s', this._debugprefix, message);
   else
-    debugError('%s%s', this._debugprefix, message);
+    debugInfo('%s%s', this._debugprefix, message);
 }
 
 function empty(){}
