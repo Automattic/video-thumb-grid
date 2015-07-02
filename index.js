@@ -180,6 +180,12 @@ Grid.prototype.render = function(fn){
   this.ffmpegStart = process.hrtime();
   this.proc = spawn(this.cmd(), args);
 
+  setTimeout(function () {
+    console.error('%s: Killing after 60 seconds', self._debugprefix);
+    self._timeout = true;
+    self.abort();
+  }, 60000);
+
   if (this._stream) {
     this._stream.pipe(this.proc.stdin);
   }
@@ -262,6 +268,7 @@ Grid.prototype.render = function(fn){
 
     if (self._stream) self._stream.unpipe(self.proc);
     if (self._error) return this.debug('errored', 'info');
+    if (self._timeout) return fn(new Error('ffmpeg took too long.'));
     if (self._aborted) return this.debug('aborted', 'info');
     if (self._parser.jpeg) return fn(new Error('JPEG end was expected.'));
     if (0 == self._parser.count) return fn(new Error('No JPEGs.'));
