@@ -108,6 +108,16 @@ Defaults to `1`.
 - Sets the `ffmpeg` video quality.
 - Returns the `Grid` instance object.
 
+### Grid#debugprefix()
+
+Returns the prefix used for debug messages.
+Defaults to an empty string.
+
+### Grid#debugprefix(String prefix)
+
+- Sets the prefix for dedugging to `prefix`.
+- Returns the `Grid` instance object.
+
 ### Grid#render(Function fn)
 
 - Triggers the thumbnailing process
@@ -132,6 +142,10 @@ Returns the program that will be called. Defaults to `ffmpeg`.
 ### Grid#proc
 
 - Property that holds the `ffmpeg` `ChildProcess`.
+
+### Grid#debug(String msg, String type)
+
+- Outputs the debugging `msg` to `stdout` when `DEBUG` is enabled. The `type` can be `info` or `ffmpeg` which helps separate the noise.
 
 ## Notes:
 
