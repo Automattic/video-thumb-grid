@@ -270,9 +270,9 @@ Grid.prototype.render = function(fn){
     self._stream.unpipe(self.proc);
 
     if (self._stream) self._stream.unpipe(self.proc);
-    if (self._error) return this.debug('errored', 'info');
+    if (self._error) return self.debug('errored', 'info');
     if (self._timeout) return fn(new Error('ffmpeg took too long.'));
-    if (self._aborted) return this.debug('aborted', 'info');
+    if (self._aborted) return self.debug('aborted', 'info');
     if (self._parser.jpeg) return fn(new Error('JPEG end was expected.'));
     if (0 == self._parser.count) return fn(new Error('No JPEGs.'));
 
