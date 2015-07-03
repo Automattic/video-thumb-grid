@@ -1,4 +1,10 @@
 
+0.2.5 / 2015-07-03
+==================
+
+  * Limit threads to 2
+  * Document `debugprefix` and `debug`
+
 0.2.4 / 2015-07-02
 ==================
 
