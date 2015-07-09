@@ -133,6 +133,9 @@ Grid.prototype.args = function(){
   // seek
   if (this.start() > 0) argv.push('-ss', time.secondsToTC(this.start()));
 
+  argv.push('-analyzeduration', '50M');
+  argv.push('-probesize', '50M');
+
   // input stream
   argv.push('-i', this._path || 'pipe:0');
 
