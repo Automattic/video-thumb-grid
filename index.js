@@ -183,12 +183,6 @@ Grid.prototype.render = function(fn){
   this.ffmpegStart = process.hrtime();
   this.proc = spawn(this.cmd(), args);
 
-  setTimeout(function () {
-    console.error('%s: Killing after 60 seconds', self._debugprefix);
-    self._timeout = true;
-    self.abort();
-  }, 60000);
-
   if (this._stream) {
     this._stream.pipe(this.proc.stdin);
   }
