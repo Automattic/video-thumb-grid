@@ -1,4 +1,10 @@
 
+0.2.7 / 2015-07-08
+==================
+
+  * Remove timeout. It holds up the process when it does complete. Would need to be improved if added back.
+  * Only unpipe if there is a stream, which is done in the next line.
+
 0.2.6 / 2015-07-03
 ==================
 
