@@ -267,8 +267,6 @@ Grid.prototype.render = function(fn){
   });
 
   function complete(){
-    self._stream.unpipe(self.proc);
-
     if (self._stream) self._stream.unpipe(self.proc);
     if (self._error) return self.debug('errored', 'info');
     if (self._timeout) return fn(new Error('ffmpeg took too long.'));
