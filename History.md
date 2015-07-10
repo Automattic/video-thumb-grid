@@ -1,4 +1,10 @@
 
+0.2.8 / 2015-07-09
+==================
+
+  * Add back the timer that was removed in 77035dd2c35a266ecedbe42b07d8195c4d2b7f09. Simple solution is to `clearTimeout`.
+  * set `analyzeduration` and `probesize` so `ffmpeg` can find the codec parameters with more videos
+
 0.2.7 / 2015-07-08
 ==================
 
