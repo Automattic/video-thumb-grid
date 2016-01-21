@@ -1,4 +1,10 @@
 
+0.2.9 / 2016-01-21
+==================
+
+  * bump `debug`
+  * Bump `picha` since it no longer installs.
+
 0.2.8 / 2015-07-09
 ==================
 
