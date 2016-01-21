@@ -3,7 +3,7 @@
   "version": "0.2.8",
   "description": "Generates a sprite grid of video thumbnails using `ffmpeg`.",
   "dependencies": {
-    "debug": "2.0.0",
+    "debug": "2.2.0",
     "jpeg-stream": "0.1.0",
     "picha": "0.4.9",
     "pixel-stack": "0.2.1",
