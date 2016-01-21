@@ -1,4 +1,9 @@
 
+0.3.0 / 2016-01-21
+==================
+
+  * Double the size, which should allow us to determine codecs for even more videos.
+
 0.2.9 / 2016-01-21
 ==================
 
