@@ -156,7 +156,7 @@ Grid.prototype.args = function(){
   argv.push('-q', this.vquality());
 
   // ensure streaming output
-  argv.push('-updatefirst', 1);
+  argv.push('-update', 1);
 
   // limit threads
   argv.push('-threads', 2);
