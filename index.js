@@ -35,6 +35,7 @@ function Grid(input, fn){
   this._height = 144;
   this._start = 0;
   this._rows = null;
+  this._cmdTimeout = 60;
   this._cmd = 'ffmpeg';
   this._debugprefix = '';
 
@@ -111,6 +112,14 @@ Grid.prototype.interval = function(v){
   return this._interval;
 };
 
+Grid.prototype.cmdTimeout = function(v){
+  if (arguments.length) {
+    this._cmdTimeout= v;
+    return this;
+  }
+  return this._cmdTimeout;
+}
+
 Grid.prototype.cmd = function(v){
   if (arguments.length) {
     this._cmd = v;
@@ -186,11 +195,12 @@ Grid.prototype.render = function(fn){
   this.ffmpegStart = process.hrtime();
   this.proc = spawn(this.cmd(), args);
 
+  var timeout = this.cmdTimeout();
   this._procTimer = setTimeout(function () {
-    console.error('%s: Killing after 60 seconds', self._debugprefix);
+    console.error('%s: Killing after %f seconds', self._debugprefix, timeout);
     self._timeout = true;
     self.abort();
-  }, 60000);
+  }, timeout * 1000);
 
   if (this._stream) {
     this._stream.pipe(this.proc.stdin);
