@@ -36,6 +36,8 @@ function Grid(input, fn){
   this._start = 0;
   this._rows = null;
   this._cmdTimeout = 60;
+  this._analyzeDuration = '100M';
+  this._probeSize = '100M';
   this._cmd = 'ffmpeg';
   this._debugprefix = '';
 
@@ -114,10 +116,26 @@ Grid.prototype.interval = function(v){
 
 Grid.prototype.cmdTimeout = function(v){
   if (arguments.length) {
-    this._cmdTimeout= v;
+    this._cmdTimeout = v;
     return this;
   }
   return this._cmdTimeout;
+}
+
+Grid.prototype.analyzeDuration = function(v){
+  if (arguments.length) {
+    this._analyzeDuration = v;
+    return this;
+  }
+  return this._analyzeDuration;
+}
+
+Grid.prototype.probeSize = function(v){
+  if (arguments.length) {
+    this._probeSize = v;
+    return this;
+  }
+  return this._probeSize;
 }
 
 Grid.prototype.cmd = function(v){
@@ -142,8 +160,8 @@ Grid.prototype.args = function(){
   // seek
   if (this.start() > 0) argv.push('-ss', time.secondsToTC(this.start()));
 
-  argv.push('-analyzeduration', '100M');
-  argv.push('-probesize', '100M');
+  argv.push('-analyzeduration', this.analyzeDuration());
+  argv.push('-probesize', this.probeSize());
 
   // input stream
   argv.push('-i', this._path || 'pipe:0');
