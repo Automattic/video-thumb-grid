@@ -27,6 +27,7 @@ function Grid(input, fn){
   }
 
   // config
+  this._videoDuration = null;
   this._count = 100;
   this._interval = 1;
   this._quality = 50;
@@ -92,6 +93,14 @@ Grid.prototype.count = function(v){
     return this;
   }
   return this._count;
+};
+
+Grid.prototype.videoDuration = function(v){
+  if (arguments.length) {
+    this._videoDuration = v;
+    return this;
+  }
+  return this._videoDuration;
 };
 
 Grid.prototype.rows = function(v){
@@ -177,7 +186,14 @@ Grid.prototype.args = function(){
   argv.push('-vf', vf);
 
   // number of frames
-  argv.push('-vframes', this.count());
+  if ( null !== this.videoDuration() ) {
+    // generate ONLY the exact amount of frames we want, otherwise ffmpeg HLS processing hangs
+    var framesRemaining = Math.floor( ( this.videoDuration() - this.start() ) / this.interval() );
+    var numFrames = Math.min( this.count(), framesRemaining );
+    argv.push('-vframes', numFrames);
+  } else {
+    argv.push('-vframes', this.count()); 
+  }
 
   // quality of the frames
   argv.push('-q', this.vquality());
