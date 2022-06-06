@@ -41,6 +41,7 @@ function Grid(input, fn){
   this._probeSize = '100M';
   this._cmd = 'ffmpeg';
   this._debugprefix = '';
+  this._userAgent = '';
 
   this._parser = new JPEGStream;
 
@@ -163,6 +164,14 @@ Grid.prototype.debugprefix = function(v){
   return this._debugprefix;
 };
 
+Grid.prototype.userAgent = function(v){
+  if (arguments.length) {
+    this._userAgent = v;
+    return this;
+  }
+  return this._userAgent;
+};
+
 Grid.prototype.args = function(){
   var argv = [];
 
@@ -171,6 +180,10 @@ Grid.prototype.args = function(){
 
   argv.push('-analyzeduration', this.analyzeDuration());
   argv.push('-probesize', this.probeSize());
+
+  if ( '' !== this.userAgent() ) {
+    argv.push( '-user-agent', this.userAgent() );
+  }
 
   // input stream
   argv.push('-i', this._path || 'pipe:0');
